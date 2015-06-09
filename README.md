@@ -18,6 +18,11 @@ self.driver setting for the browser you want to use.
 See the Selenium website (seleniumhq.org) for more information
 on browsers supported by Selenium.
 
+There also may be a dependency upon the Python page-objects
+project.  If you are using Anaconda Python (http://continuum.io/downloads)
+you can use the pip tool to install this:
+pip install page-objects
+
 To execute the tests, each one can manually be run using
 the command line (Linux/Mac OS):
 
