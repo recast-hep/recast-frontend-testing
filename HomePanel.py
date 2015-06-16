@@ -37,14 +37,9 @@ class HomePanel(PageObject):
         try: pe = PageElement(link_text="New Analysis")
         except NoSuchElementException, e:
             return False
-        #return pe
         pe.click()
         return AnalysisPanel(self.w,'/?q=user/login')
-        #return True
-        ##if(self.is_element_present(By.LINK_TEXT,"New Analysis")):
-        ##return PageElement(link_text="New Analysis")
-        ##else: return False
-
+    
     def getSubscribe(self):
         try: pe = PageElement(link_text="subscribe")
         except NoSuchElementException, e:
@@ -152,23 +147,55 @@ class HomePanel(PageObject):
         pg = self.w.find_element_by_css_selector(".pager-current")
         assert int(pg.text) == 1
 
+    def testAnalysisSort(self):
+        requestColHeader = self.w.find_element_by_link_text('Analysis')
+        requestColHeader.click
+        analysisTexts = self.w.find_elements_by_class_name('vies-field-field-request-analysis')
+        #for anaText in analysisTexts:
+        #    pass
 
+    def testRequestSort(self):
+        requestColHeader = self.w.find_element_by_link_text('Request')
+        requestColHeader.click
+        lastRq = ""
+        allRqTds = self.w.find_elements_by_class_name('views-field-title')
+        for rqNum in allRqTds:
+            if(rqNum.text == u'Request'): continue
+            if(lastRq == ""): 
+                lastRq = rqNum.text
+                continue
+            fltstr = float(rqNum.text)
+            lstflt = float(lastRq)
+            assert fltstr > lstflt
+        
+        requestColHeader.click
+        allRqTds = self.w.find_elements_by_class_name('views-field-title')
+        lastRq = ""
+        for rqNum in allRqTds:
+            if(rqNum == u'Request'): continue
+            if(lastRq == ""):
+                lastRq = rqNum.text
+                continue
+            fltstr = float(rqNum.text)
+            lstflt = float(lastRq)
+            assert fltstr < lstflt
+    
+    def testStatusSort(self):
+        pass
+    
 # USEFUL BOILER PLATE FUNCTIONS CREATED BY SELENIUM_IDE
     def is_element_present(self, how, what):
-        #try: self.webdriver.find_element(by=how, value=what)
         try: self.w.find_element(by=how, value=what)
         except NoSuchElementException, e: return False
         return True
 
     def is_alert_present(self):
-        #try: self.webdriver.switch_to_alert()
         try: self.w.switch_to_alert()
         except NoAlertPresentException, e: return False
         return True
 
     def close_alert_and_get_its_text(self):
         try:
-            #alert = self.webdriver.switch_to_alert()
             alert = self.w.switch_to_alert()
             alert_text = alert.text
             if self.accept_next_alert:

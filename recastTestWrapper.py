@@ -28,7 +28,10 @@ class recastTestWrapper(unittest.TestCase):
         numpgs = homepanel.getTotHomeTblPgs()
         print "\nnumpgs: {}".format(numpgs)
         assert numpgs > 1
-        homepanel.testPaging()        
+        homepanel.testPaging()
+        homepanel.testRequestSort()
+        homepanel.testAnalysisSort()
+        homepanel.testStatusSort()
         
     def testRecastHomeLogin(self):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
