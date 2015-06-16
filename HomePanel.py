@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from selenium import webdriver
+#from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
+#from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from page_objects import PageObject, PageElement
-from LoginPanel import LoginPanel
+try:
+    from LoginPanel import LoginPanel
+except ImportError:
+    pass
+try:
+    from RequestsPanel import RequestsPanel
+except ImportError:
+    pass
+try:
+    from AnalysisPanel import AnalysisPanel
+except ImportError:
+    pass
 #from locators import MainPageLocators
 
 class HomePanel(PageObject):
@@ -23,32 +34,44 @@ class HomePanel(PageObject):
     searchBox = PageElement(id_="edit-search-block-form--2")
 
     def getNewAnalysis(self):
-        #try: pe = PageElement(link_text,"New Analysis")
-        #except NoSuchElementException, e: return False
-	#return pe
-	if(self.is_element_present(By.LINK_TEXT,"New Analysis")):
-	    return PageElement(link_text,"New Analysis")
-	else: return False
+        try: pe = PageElement(link_text="New Analysis")
+        except NoSuchElementException, e:
+            return False
+        #return pe
+        pe.click()
+        return AnalysisPanel(self.w,'/?q=user/login')
+        #return True
+        ##if(self.is_element_present(By.LINK_TEXT,"New Analysis")):
+        ##return PageElement(link_text="New Analysis")
+        ##else: return False
 
     def getSubscribe(self):
-        return PageElement(link_text,"subscribe")
+        try: pe = PageElement(link_text="subscribe")
+        except NoSuchElementException, e:
+            return False
+        pe.click()
+        return True
 
     def getAddRqst(self):
-        return PageElement(link_text,"Add Request")
+        try: pe = PageElement(link_text="Add Request")
+        except NoSuchElementException, e:
+            return False
+        pe.click()
+        return True #return PageElement(link_text="Add Request")
 
     def chkHeaderLinks(self):
-	assert self.is_element_present(By.LINK_TEXT,"Feedback")
-	assert self.is_element_present(By.LINK_TEXT,"Login")
-	assert self.is_element_present(By.LINK_TEXT,"Register")
+        assert self.is_element_present(By.LINK_TEXT,"Feedback")
+        assert self.is_element_present(By.LINK_TEXT,"Login")
+        assert self.is_element_present(By.LINK_TEXT,"Register")
 
     def chkLinks_NoLogin(self): # Test when not logged links not present
-        print "chkLinksNL\n"
+        print "check Links - No Login\n"
         assert not self.is_element_present(By.LINK_TEXT,"New Analysis")
         assert not self.is_element_present(By.LINK_TEXT,'subscribe')
         assert not self.is_element_present(By.LINK_TEXT,'add request')
-	print "done\n"
 
     def chkLinks_Login(self):  # Test when logged in links are visible
+        print "check links - Logged in\n"
         assert self.is_element_present(By.LINK_TEXT,'New Analysis')
         assert self.is_element_present(By.LINK_TEXT,'subscribe')
         assert self.is_element_present(By.LINK_TEXT,'add request')
@@ -59,26 +82,28 @@ class HomePanel(PageObject):
         return maxpage
 
     def getLoginPanel(self): # returns a LoginPanel object?
+        #loginBtn = PageElement(link_text="Login")
+        loginBtn = self.w.find_element_by_link_text('Login')
         loginBtn.click()
-        return LoginPanel(self)
+        return LoginPanel(self.w,'/?q=user/login')
 
     def testPaging(self):
         pgcnt = 1
+        actCnt = 0
+        incompCnt = 0
+        inprogCnt = 0
+        cancCnt = 0
+        compCnt = 0
         while(self.is_element_present(By.PARTIAL_LINK_TEXT,"next ")):
-	    pg = self.w.find_element_by_css_selector(".pager-current")
-	    print "obj: {}\n".format(pg)
-	    pgt = pg.text
-	    print "text: {}\n".format(pgt)
+            pg = self.w.find_element_by_css_selector(".pager-current")
+            pgt = pg.text
+            #print "text: {}\n".format(pgt)
             #curpg = int(self.w.find_element_by_css_selector(".pager-current").text)
-	    curpg = int(pgt)
+            curpg = int(pgt)
             print curpg
             assert curpg == pgcnt
             pgcnt += 1
-            actCnt = 0
-            incompCnt = 0
-            inprogCnt = 0
-            cancCnt = 0
-            compCnt = 0
+            
             allstats = self.w.find_elements(By.CLASS_NAME,"views-field-field-request-status")
             #allstats = driver.find_elements(By.CLASS_NAME,"views-field-field-request-status")
             for statcol in allstats:
@@ -94,12 +119,54 @@ class HomePanel(PageObject):
                     inprogCnt += 1
                 if(statcol.text == u'Cancelled'):
                     cancCnt += 1
-	    nextBtn = self.w.find_element_by_partial_link_text("next ")
-	    nextBtn.click()
+            nextBtn = self.w.find_element_by_partial_link_text("next ")
+            #nextBtn = PageElement(partial_link_text="next ")
+            nextBtn.click()
 
-	print 'status counts: A{} IC{} C{} INP{} CAN{}'.format(actCnt,incompCnt,compCnt,inprogCnt,cancCnt)
-	assert not (actCnt == 0 and incompCnt == 0 and compCnt == 0 and inprogCnt == 0 and cancCnt == 0)
+        print 'status counts: A{} IC{} C{} INP{} CAN{}'.format(actCnt,incompCnt,compCnt,inprogCnt,cancCnt)
+        assert not (actCnt == 0 and incompCnt == 0 and compCnt == 0 and inprogCnt == 0 and cancCnt == 0)
 
+
+# Test the back page button across all pages in Analyses Catalog table
+    def testBackPaging(self):
+        pgcnt = 1
+        actCnt = 0
+        incompCnt = 0
+        inprogCnt = 0
+        cancCnt = 0
+        compCnt = 0
+        while(self.is_element_present(By.PARTIAL_LINK_TEXT," prev")):
+            #pg = self.w.find_element_by_css_selector(".pager-current")
+            pg = PageElement(class_name="pager-current")
+            pgt = pg.text
+            #print "text: {}\n".format(pgt)
+            #curpg = int(self.w.find_element_by_css_selector(".pager-current").text)
+            curpg = int(pgt)
+            print curpg
+            assert curpg == pgcnt
+            pgcnt += 1
+            
+            allstats = self.w.find_elements(By.CLASS_NAME,"views-field-field-request-status")
+            #allstats = driver.find_elements(By.CLASS_NAME,"views-field-field-request-status")
+            for statcol in allstats:
+                if (statcol.text == u'Status'): # column header, ignore
+                    continue
+                if(statcol.text == u'Active'):
+                    actCnt += 1
+                if(statcol.text == u'Incomplete'):
+                    incompCnt += 1
+                if(statcol.text == u'Complete'):
+                    compCnt += 1
+                if(statcol.text == u'InProgress'):
+                    inprogCnt += 1
+                if(statcol.text == u'Cancelled'):
+                    cancCnt += 1
+            #nextBtn = self.w.find_element_by_partial_link_text("next ")
+            nextBtn = PageElement(partial_link_text="next ")
+            nextBtn.click()
+
+        print 'status counts: A{} IC{} C{} INP{} CAN{}'.format(actCnt,incompCnt,compCnt,inprogCnt,cancCnt)
+        assert not (actCnt == 0 and incompCnt == 0 and compCnt == 0 and inprogCnt == 0 and cancCnt == 0)
 
 # USEFUL BOILER PLATE FUNCTIONS CREATED BY SELENIUM_IDE
     def is_element_present(self, how, what):
