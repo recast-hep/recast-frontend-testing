@@ -28,15 +28,16 @@ class recastTestWrapper(unittest.TestCase):
         numpgs = homepanel.getTotHomeTblPgs()
         print "\nnumpgs: {}".format(numpgs)
         assert numpgs > 1
-        homepanel.testPaging()
-        #homepanel.loginBtn.click()
+        homepanel.testPaging()        
+        
+    def testRecastHomeLogin(self):
+        homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
+        homepanel.get("/")  # Launch the default page
         loginpanel = homepanel.getLoginPanel()
         loginpanel.username = "testuser1"
         loginpanel.password = "Pd6g%X2"
         loginpanel.loginsubmit.click()
-        #loginpanel.form.submit
         loginpanel.waitForView()
-        #loginpanel.loginsubmit.click
         h1title = loginpanel.getPageTitle()
         pattstr1 = 'testuser1'
         h1patt = re.compile(pattstr1)
@@ -47,17 +48,25 @@ class recastTestWrapper(unittest.TestCase):
         else:
             print '"{}" != '.format(h1title)
             print '"{}"/n'.format(pattstr1)
+            assert False
         pgtitle = loginpanel.getTitle()
         pattstr2 = "testuser1 | RECAST [beta]"
         patt = re.compile(pattstr2)
         mout = patt.match(pgtitle)
         if mout:
-            titlelen = len(mout.group())
-            assert titlelen == len(pattstr2)
+            #titlelen = mout.endpos - mout.pos
+            pglen = len(pgtitle)
+            patlen = len(pattstr2)
+            if patlen != pglen:
+                print 'patlen {} pglen {}'.format(patlen,pglen)
+                print '"{}"'.format(pgtitle)
+                print ' != "{}"'.format(pattstr2)
+                assert False
         else:
             print '"{}" != '.format(pgtitle)
             print '"{}"/n'.format(pattstr2)
             assert False
+        
 
     def tearDown(self):
         self.driver.close()

@@ -28,7 +28,7 @@ class HomePanel(PageObject):
     analysisSort = PageElement(link_text="Analysis")
     statusSort = PageElement(link_text="Status")
     nextBtn = PageElement(partial_link_text="next ")
-    prevBtn = PageElement(partial_link_text=" prev")
+    prevBtn = PageElement(partial_link_text=" previous")
     firstBtn = PageElement(partial_link_text=" first")
     lastBtn = PageElement(partial_link_text="last ")
     searchBox = PageElement(id_="edit-search-block-form--2")
@@ -88,6 +88,8 @@ class HomePanel(PageObject):
         return LoginPanel(self.w,'/?q=user/login')
 
     def testPaging(self):
+        mxPgLbl = self.w.find_elements_by_class_name("pager-item")
+        totpgs = len(mxPgLbl) + 1 # +1 b/c current page label has class=active
         pgcnt = 1
         actCnt = 0
         incompCnt = 0
@@ -97,15 +99,12 @@ class HomePanel(PageObject):
         while(self.is_element_present(By.PARTIAL_LINK_TEXT,"next ")):
             pg = self.w.find_element_by_css_selector(".pager-current")
             pgt = pg.text
-            #print "text: {}\n".format(pgt)
-            #curpg = int(self.w.find_element_by_css_selector(".pager-current").text)
             curpg = int(pgt)
             print curpg
             assert curpg == pgcnt
             pgcnt += 1
             
             allstats = self.w.find_elements(By.CLASS_NAME,"views-field-field-request-status")
-            #allstats = driver.find_elements(By.CLASS_NAME,"views-field-field-request-status")
             for statcol in allstats:
                 if (statcol.text == u'Status'): # column header, ignore
                     continue
@@ -125,48 +124,34 @@ class HomePanel(PageObject):
 
         print 'status counts: A{} IC{} C{} INP{} CAN{}'.format(actCnt,incompCnt,compCnt,inprogCnt,cancCnt)
         assert not (actCnt == 0 and incompCnt == 0 and compCnt == 0 and inprogCnt == 0 and cancCnt == 0)
-
-
-# Test the back page button across all pages in Analyses Catalog table
-    def testBackPaging(self):
-        pgcnt = 1
         actCnt = 0
         incompCnt = 0
         inprogCnt = 0
         cancCnt = 0
         compCnt = 0
-        while(self.is_element_present(By.PARTIAL_LINK_TEXT," prev")):
+        while(self.is_element_present(By.PARTIAL_LINK_TEXT," previous")):
             #pg = self.w.find_element_by_css_selector(".pager-current")
-            pg = PageElement(class_name="pager-current")
+            pg = self.w.find_element_by_css_selector(".pager-current")
             pgt = pg.text
-            #print "text: {}\n".format(pgt)
-            #curpg = int(self.w.find_element_by_css_selector(".pager-current").text)
             curpg = int(pgt)
             print curpg
             assert curpg == pgcnt
-            pgcnt += 1
-            
-            allstats = self.w.find_elements(By.CLASS_NAME,"views-field-field-request-status")
-            #allstats = driver.find_elements(By.CLASS_NAME,"views-field-field-request-status")
-            for statcol in allstats:
-                if (statcol.text == u'Status'): # column header, ignore
-                    continue
-                if(statcol.text == u'Active'):
-                    actCnt += 1
-                if(statcol.text == u'Incomplete'):
-                    incompCnt += 1
-                if(statcol.text == u'Complete'):
-                    compCnt += 1
-                if(statcol.text == u'InProgress'):
-                    inprogCnt += 1
-                if(statcol.text == u'Cancelled'):
-                    cancCnt += 1
-            #nextBtn = self.w.find_element_by_partial_link_text("next ")
-            nextBtn = PageElement(partial_link_text="next ")
-            nextBtn.click()
+            pgcnt -= 1
+            prevBtn = self.w.find_element_by_partial_link_text(" previous")
+            prevBtn.click()
+            assert len(self.w.find_elements(By.PARTIAL_LINK_TEXT,"next ")) == 1
+            assert len(self.w.find_elements(By.PARTIAL_LINK_TEXT,"last ")) == 1
+        
+        lastBtn = self.w.find_element_by_partial_link_text("last ")
+        lastBtn.click()
+        pg = self.w.find_element_by_css_selector(".pager-current")
+        pgt = pg.text
+        assert int(pgt) == totpgs
+        firstBtn =  self.w.find_element_by_partial_link_text(" first")
+        firstBtn.click()
+        pg = self.w.find_element_by_css_selector(".pager-current")
+        assert int(pg.text) == 1
 
-        print 'status counts: A{} IC{} C{} INP{} CAN{}'.format(actCnt,incompCnt,compCnt,inprogCnt,cancCnt)
-        assert not (actCnt == 0 and incompCnt == 0 and compCnt == 0 and inprogCnt == 0 and cancCnt == 0)
 
 # USEFUL BOILER PLATE FUNCTIONS CREATED BY SELENIUM_IDE
     def is_element_present(self, how, what):
