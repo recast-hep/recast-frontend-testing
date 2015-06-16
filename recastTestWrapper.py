@@ -1,14 +1,22 @@
 from selenium import webdriver
+#from selenium.support.ui import 
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 from HomePanel import HomePanel
 from LoginPanel import LoginPanel
+from CatalogPanel import CatalogPanel
+from AboutPanel import AboutPanel
+from NewsPanel import NewsPanel
+from DevelopersPanel import DevelopersPanel
+
 import unittest, time, re
 
 class recastTestWrapper(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Chrome() # self.driver = webdriver.Firefox()
-        #self.driver.implicitly_wait(5) # seconds
+        self.driver = webdriver.Firefox()
+        #self.driver = webdriver.Chrome()
+        self.driver.implicitly_wait(5)
 
 
     def testRecastHomeBasic(self):
@@ -21,21 +29,38 @@ class recastTestWrapper(unittest.TestCase):
         print "\nnumpgs: {}".format(numpgs)
         assert numpgs > 1
         homepanel.testPaging()
-
-    #def __new__(cls, *args, **kwargs):
-    #    if not cls._instance:
-    #    cls._instance = super(recastTestWrapper, cls).__new__(cls, *args, **kwargs)
-    #    return cls._instance
-
-    #def connect(self, host="http://recast.perimeterinstitute.ca/"):
-    #    #self.driver = webdriver.Firefox()
-    #    self.driver = webdriver.Chrome() # Loads faster than FF, but not preferred
-    #    self.base_url = host
-    #    return self.driver
+        #homepanel.loginBtn.click()
+        loginpanel = homepanel.getLoginPanel()
+        loginpanel.username = "testuser1"
+        loginpanel.password = "Pd6g%X2"
+        loginpanel.loginsubmit.click()
+        #loginpanel.form.submit
+        loginpanel.waitForView()
+        #loginpanel.loginsubmit.click
+        h1title = loginpanel.getPageTitle()
+        pattstr1 = 'testuser1'
+        h1patt = re.compile(pattstr1)
+        h1out = h1patt.match(h1title)
+        if h1out:
+            h1len = len(h1out.group())
+            assert h1len == len(pattstr1)
+        else:
+            print '"{}" != '.format(h1title)
+            print '"{}"/n'.format(pattstr1)
+        pgtitle = loginpanel.getTitle()
+        pattstr2 = "testuser1 | RECAST [beta]"
+        patt = re.compile(pattstr2)
+        mout = patt.match(pgtitle)
+        if mout:
+            titlelen = len(mout.group())
+            assert titlelen == len(pattstr2)
+        else:
+            print '"{}" != '.format(pgtitle)
+            print '"{}"/n'.format(pattstr2)
+            assert False
 
     def tearDown(self):
         self.driver.close()
-        #self.webdriver.close()
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
@@ -63,5 +88,5 @@ class recastTestWrapper(unittest.TestCase):
 
 #---START OF SCRIPT
 if __name__=="__main__":
-   suite = unittest.TestLoader().loadTestsFromTestCase (recastTestWrapper)
-   unittest.TextTestRunner(verbosity=2).run(suite)
+    suite = unittest.TestLoader().loadTestsFromTestCase (recastTestWrapper)
+    unittest.TextTestRunner(verbosity=2).run(suite)
