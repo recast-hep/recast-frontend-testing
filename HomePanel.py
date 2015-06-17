@@ -77,14 +77,12 @@ class HomePanel(PageObject):
         return maxpage
 
     def getLoginPanel(self): # returns a LoginPanel object?
-        #loginBtn = PageElement(link_text="Login")
         loginBtn = self.w.find_element_by_link_text('Login')
         loginBtn.click()
         return LoginPanel(self.w,'/?q=user/login')
 
     def testPaging(self):
-        mxPgLbl = self.w.find_elements_by_class_name("pager-item")
-        totpgs = len(mxPgLbl) + 1 # +1 b/c current page label has class=active
+        totpgs = self.getTotHomeTblPgs()
         pgcnt = 1
         actCnt = 0
         incompCnt = 0
@@ -196,7 +194,7 @@ class HomePanel(PageObject):
     
     def testStatusSort(self):
         statusColHeader = self.w.find_element_by_link_text('Status')
-        statusColHeader.click()
+        statusColHeader.click() # select Ascending
         allStatusTds = self.w.find_elements_by_class_name('views-field-field-request-status')
         prevStatus = ""
         for statCol in allStatusTds:
@@ -206,7 +204,7 @@ class HomePanel(PageObject):
                 prevStatus = statCol.text
                 continue
             if(statCol.text > prevStatus): # <= is OK
-                print "{} > {}".format(statCol, prevStatus)
+                print "{} > {}".format(statCol.text, prevStatus)
                 #assert FALSE  # UNCOMMENT 
             prevStatus = statCol.text
     
