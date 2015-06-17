@@ -8,7 +8,7 @@ these tests, first download the python Selenium WebDriver module
 from https://pypi.python.org/pypi/selenium and use
 one of the methods described there to install the module
 into your python installation.  This installation can also
-be done within a 'venv' container if desired.
+be done within a python 'venv' container/environment if desired.
 
 These scripts utilize the Chrome web browser driver which
 requires that the Chrome browser be installed in your
@@ -18,14 +18,9 @@ self.driver setting for the browser you want to use.
 See the Selenium website (seleniumhq.org) for more information
 on browsers supported by Selenium.
 
-There also may be a dependency upon the Python page-objects
-project.  If you are using Anaconda Python (http://continuum.io/downloads)
+There also is a dependency upon the Python page-objects
+package.  If you are using Anaconda Python (http://continuum.io/downloads)
 you can use the pip tool to install this:
 pip install page-objects
 
-To execute the tests, each one can manually be run using
-the command line (Linux/Mac OS):
 
-python script-name
-
-will initiate the run of that test.
