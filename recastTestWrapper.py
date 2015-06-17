@@ -57,7 +57,6 @@ class recastTestWrapper(unittest.TestCase):
         patt = re.compile(pattstr2)
         mout = patt.match(pgtitle)
         if mout:
-            #titlelen = mout.endpos - mout.pos
             pglen = len(pgtitle)
             patlen = len(pattstr2)
             if patlen != pglen:
@@ -69,6 +68,7 @@ class recastTestWrapper(unittest.TestCase):
             print '"{}" != '.format(pgtitle)
             print '"{}"/n'.format(pattstr2)
             assert False
+        loginpanel.
         
 
     def tearDown(self):

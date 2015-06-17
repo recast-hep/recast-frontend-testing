@@ -6,6 +6,7 @@
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from page_objects import PageObject, PageElement
+import re
 
 try:
     from HomePanel import HomePanel
@@ -85,20 +86,45 @@ class LoginPanel(PageObject):
     def waitForView(self):
         self.w.find_element_by_partial_link_text('View')
 
+    def getRealName(self):
+        allUserDatum = self.w.find_elements_by_class_name('field-item')
+        return allUserDatum[0].text
+
+    def auditUserData(self):
+        nameOK = False
+        instOK = False
+        allUserDatum = self.w.find_elements_by_class_name('field-item')
+        for datum in allUserDatum:
+            pattStrName = 'Wayne Motycka'
+            nameLen = len(pattStrName)
+            pattStrInstitution = 'University of Nebraska at Lincoln'
+            instLen = len(pattStrInstitution)
+            pattName = re.compile(pattStrName)
+            pattInst = re.compile(pattStrInstitution)
+            nameMatch = pattName.match(datum.text)
+            if nameMatch.start() == 0 & nameMatch.end() == (nameLen -1):
+                nameOK = True
+            instMatch = pattInst.match(datum.text)
+            if instMatch.start() == 0 & instMatch.end() == (instLen -1):
+                instOK = True
+        assert (nameOK & instOK)
+        
+            
+
     ## BOILER PLATE FUNCTIONS FROM Selenium IDE BELOW
     def is_element_present(self, how, what):
-        try: self.driver.find_element(by=how, value=what)
+        try: self.w.find_element(by=how, value=what)
         except NoSuchElementException, e: return False
         return True
     
     def is_alert_present(self):
-        try: self.driver.switch_to_alert()
+        try: self.w.switch_to_alert()
         except NoAlertPresentException, e: return False
         return True
     
     def close_alert_and_get_its_text(self):
         try:
-            alert = self.driver.switch_to_alert()
+            alert = self.w.switch_to_alert()
             alert_text = alert.text
             if self.accept_next_alert:
                 alert.accept()
@@ -106,10 +132,4 @@ class LoginPanel(PageObject):
                 alert.dismiss()
             return alert_text
         finally: self.accept_next_alert = True
-    
-#    def tearDown(self):
-#        self.driver.quit()
-#        self.assertEqual([], self.verificationErrors)
 
-#if __name__ == "__main__":
-#    unittest.main()
