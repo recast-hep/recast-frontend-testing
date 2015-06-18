@@ -16,6 +16,7 @@ class recastTestWrapper(unittest.TestCase):
     pageTitleNoLogin = "Latest Requests | RECAST [beta]"
     testuser = "testuser1"
     userpwd = "Pd6g%X2"
+    whitePaperLink = "http://arxiv.org/abs/1010.2506"
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -28,21 +29,30 @@ class recastTestWrapper(unittest.TestCase):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
         homepanel.get("/")  # Launch the default page
         homepanel.chkHeaderLinks()
-        self.driver.implicitly_wait(1)
+        self.driver.implicitly_wait(1) # Speed up search for non-valid links
         homepanel.chkLinks_NoLogin()
-        self.driver.implicitly_wait(5)
+        self.driver.implicitly_wait(5) # reset wait to normal
         homeTitle = homepanel.getTitle()
         titleStr = str(homeTitle) # unicode -> str conversion
-        if(titleStr != self.pageTitleNoLogin):
+        if titleStr != self.pageTitleNoLogin:
             print "page title mismatch {} != {}".format(titleStr, self.pageTitleNoLogin)
             assert False
         numpgs = homepanel.getTotHomeTblPgs()
-        print "\nnumpgs: {}".format(numpgs)
+        print "numpgs: {}".format(numpgs)
         assert numpgs > 1
         homepanel.testPaging()
+        homepanel.pageSiteName.click() # Reset to initial page view
         homepanel.testRequestSort()
+        homepanel.pageSiteName.click()
         homepanel.testAnalysisSort()
+        homepanel.pageSiteName.click()
         homepanel.testStatusSort()
+        homepanel.pageSiteName.click()
+        wpUrl = homepanel.getPdfUrl()
+        if str(wpUrl) != self.whitePaperLink:
+            print "Unexpected white paper PDF link value"
+            assert False
+        
         
     def testRecastHomeLogin(self):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
@@ -54,22 +64,23 @@ class recastTestWrapper(unittest.TestCase):
         loginpanel.waitForView()
         h1title = loginpanel.getPageTitle()
         h1str = str(h1title)
-        if(h1str != self.pageTitleLoggedin):
+        if h1str != self.testuser:
             print '"{}" != '.format(h1title)
-            print '"{}"/n'.format(self.testuser)
+            print '"{}"'.format(self.testuser)
             assert False
         pgtitle = loginpanel.getTitle()
-        patt = re.compile(self.pageTitleLoggedin)
-        mout = patt.match(pgtitle)
-        if mout:
-            pglen = len(pgtitle)
-            patlen = len(self.pageTitleLoggedin)
-            if patlen != pglen:
-                print 'patlen {} pglen {}'.format(patlen,pglen)
-                print '"{}"'.format(pgtitle)
-                print ' != "{}"'.format(self.pageTitleLoggedin)
-                assert False
-        else:
+        if str(pgtitle) != self.pageTitleLoggedin:
+        #patt = re.compile(self.pageTitleLoggedin)
+        #mout = patt.match(pgtitle)
+        #if mout:
+            #pglen = len(pgtitle)
+            #patlen = len(self.pageTitleLoggedin)
+            #if patlen != pglen:
+                #print 'patlen {} pglen {}'.format(patlen,pglen)
+                #print '"{}"'.format(pgtitle)
+                #print ' != "{}"'.format(self.pageTitleLoggedin)
+                #assert False
+        #else:
             print '"{}" != '.format(pgtitle)
             print '"{}"/n'.format(self.pageTitleLoggedin)
             assert False
