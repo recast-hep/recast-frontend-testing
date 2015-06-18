@@ -12,6 +12,10 @@ from DevelopersPanel import DevelopersPanel
 import unittest, time, re
 
 class recastTestWrapper(unittest.TestCase):
+    pageTitleLoggedin = "testuser1 | RECAST [beta]" # Change when non-Beta
+    pageTitleNoLogin = "Latest Requests | RECAST [beta]"
+    testuser = "testuser1"
+    userpwd = "Pd6g%X2"
 
     def setUp(self):
         self.driver = webdriver.Firefox()
@@ -24,7 +28,14 @@ class recastTestWrapper(unittest.TestCase):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
         homepanel.get("/")  # Launch the default page
         homepanel.chkHeaderLinks()
+        self.driver.implicitly_wait(1)
         homepanel.chkLinks_NoLogin()
+        self.driver.implicitly_wait(5)
+        homeTitle = homepanel.getTitle()
+        titleStr = str(homeTitle) # unicode -> str conversion
+        if(titleStr != self.pageTitleNoLogin):
+            print "page title mismatch {} != {}".format(titleStr, self.pageTitleNoLogin)
+            assert False
         numpgs = homepanel.getTotHomeTblPgs()
         print "\nnumpgs: {}".format(numpgs)
         assert numpgs > 1
@@ -37,38 +48,31 @@ class recastTestWrapper(unittest.TestCase):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
         homepanel.get("/")  # Launch the default page
         loginpanel = homepanel.getLoginPanel()
-        loginpanel.username = "testuser1"
-        loginpanel.password = "Pd6g%X2"
+        loginpanel.username = self.testuser
+        loginpanel.password = self.userpwd
         loginpanel.loginsubmit.click()
         loginpanel.waitForView()
         h1title = loginpanel.getPageTitle()
-        pattstr1 = 'testuser1'
-        h1patt = re.compile(pattstr1)
-        h1out = h1patt.match(h1title)
-        if h1out:
-            h1len = len(h1out.group())
-            assert h1len == len(pattstr1)
-        else:
+        h1str = str(h1title)
+        if(h1str != self.pageTitleLoggedin):
             print '"{}" != '.format(h1title)
-            print '"{}"/n'.format(pattstr1)
+            print '"{}"/n'.format(self.testuser)
             assert False
         pgtitle = loginpanel.getTitle()
-        pattstr2 = "testuser1 | RECAST [beta]"
-        patt = re.compile(pattstr2)
+        patt = re.compile(self.pageTitleLoggedin)
         mout = patt.match(pgtitle)
         if mout:
             pglen = len(pgtitle)
-            patlen = len(pattstr2)
+            patlen = len(self.pageTitleLoggedin)
             if patlen != pglen:
                 print 'patlen {} pglen {}'.format(patlen,pglen)
                 print '"{}"'.format(pgtitle)
-                print ' != "{}"'.format(pattstr2)
+                print ' != "{}"'.format(self.pageTitleLoggedin)
                 assert False
         else:
             print '"{}" != '.format(pgtitle)
-            print '"{}"/n'.format(pattstr2)
+            print '"{}"/n'.format(self.pageTitleLoggedin)
             assert False
-        loginpanel.
         
 
     def tearDown(self):

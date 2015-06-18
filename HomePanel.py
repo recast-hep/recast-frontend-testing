@@ -33,6 +33,9 @@ class HomePanel(PageObject):
     lastBtn = PageElement(partial_link_text="last ")
     searchBox = PageElement(id_="edit-search-block-form--2")
 
+    def getTitle(self):
+        return self.w.title
+
     def getNewAnalysis(self):
         try: pe = PageElement(link_text="New Analysis")
         except NoSuchElementException, e:
@@ -60,7 +63,7 @@ class HomePanel(PageObject):
         assert self.is_element_present(By.LINK_TEXT,"Register")
 
     def chkLinks_NoLogin(self): # Test when not logged links not present
-        print "check Links - No Login\n"
+        print "check absence of Links - No Login"
         assert not self.is_element_present(By.LINK_TEXT,"New Analysis")
         assert not self.is_element_present(By.LINK_TEXT,'subscribe')
         assert not self.is_element_present(By.LINK_TEXT,'add request')
@@ -159,7 +162,8 @@ class HomePanel(PageObject):
                 lastAna = inText
                 continue
             if(lastAna > inText):
-                print 'Analysis Title SORT ERROR: {} != {}'.format(lastAna.encode('ascii','ignore'),inText.encode('ascii','ignore'))
+                print "ERROR Analysis Listed Out Of Lexicographic Order - Ignore for now"
+                print 'Analysis Title SORT ERROR: "{}" <= "{}"'.format(lastAna.encode('ascii','ignore'),inText.encode('ascii','ignore'))
                 #assert False # THIS SHOULD BE UNCOMMENTED ONCE SORTING WORKS
             lastAna = inText
 
