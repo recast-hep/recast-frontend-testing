@@ -28,7 +28,7 @@ class recastTestWrapper(unittest.TestCase):
         "Test recast web Home Panel without login"
         homepanel = HomePanel( self.driver, self.pageURL)
         homepanel.get("/")  # Launch the default page
-        homepanel.chkHeaderLinks()
+        homepanel.chkHeaderLinks() #
         self.driver.implicitly_wait(1) # Speed up search for non-valid links
         homepanel.chkLinks_NoLogin()
         self.driver.implicitly_wait(5) # reset wait to normal
