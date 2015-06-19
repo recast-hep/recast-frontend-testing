@@ -30,7 +30,7 @@ class recastTestWrapper(unittest.TestCase):
         homepanel.get("/")  # Launch the default page
         homepanel.chkHeaderLinks() #
         self.driver.implicitly_wait(1) # Speed up search for non-valid links
-        homepanel.chkLinks_NoLogin()
+        homepanel.chkLinks_NoLogin() # non-extant links test
         self.driver.implicitly_wait(5) # reset wait to normal
         homeTitle = homepanel.getTitle()
         titleStr = str(homeTitle) # unicode -> str conversion
