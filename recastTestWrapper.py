@@ -1,5 +1,4 @@
 from selenium import webdriver
-#from selenium.support.ui import 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
 from HomePanel import HomePanel
@@ -12,8 +11,9 @@ from DevelopersPanel import DevelopersPanel
 import unittest, time, re
 
 class recastTestWrapper(unittest.TestCase):
+    pageURL = "http://recast.perimeterinstitute.ca" # Change when final web URL exists
     pageTitleLoggedin = "testuser1 | RECAST [beta]" # Change when non-Beta
-    pageTitleNoLogin = "Latest Requests | RECAST [beta]"
+    pageTitleNoLogin = "Latest Requests | RECAST [beta]" # Change when non-Beta
     testuser = "testuser1"
     userpwd = "Pd6g%X2"
     whitePaperLink = "http://arxiv.org/abs/1010.2506"
@@ -26,7 +26,7 @@ class recastTestWrapper(unittest.TestCase):
 
     def testRecastHomeBasic(self):
         "Test recast web Home Panel without login"
-        homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
+        homepanel = HomePanel( self.driver, self.pageURL)
         homepanel.get("/")  # Launch the default page
         homepanel.chkHeaderLinks()
         self.driver.implicitly_wait(1) # Speed up search for non-valid links
@@ -52,8 +52,7 @@ class recastTestWrapper(unittest.TestCase):
         if str(wpUrl) != self.whitePaperLink:
             print "Unexpected white paper PDF link value"
             assert False
-        
-        
+
     def testRecastHomeLogin(self):
         homepanel = HomePanel( self.driver, "http://recast.perimeterinstitute.ca")
         homepanel.get("/")  # Launch the default page
@@ -70,21 +69,9 @@ class recastTestWrapper(unittest.TestCase):
             assert False
         pgtitle = loginpanel.getTitle()
         if str(pgtitle) != self.pageTitleLoggedin:
-        #patt = re.compile(self.pageTitleLoggedin)
-        #mout = patt.match(pgtitle)
-        #if mout:
-            #pglen = len(pgtitle)
-            #patlen = len(self.pageTitleLoggedin)
-            #if patlen != pglen:
-                #print 'patlen {} pglen {}'.format(patlen,pglen)
-                #print '"{}"'.format(pgtitle)
-                #print ' != "{}"'.format(self.pageTitleLoggedin)
-                #assert False
-        #else:
             print '"{}" != '.format(pgtitle)
             print '"{}"/n'.format(self.pageTitleLoggedin)
             assert False
-        
 
     def tearDown(self):
         self.driver.close()
@@ -97,7 +84,6 @@ class recastTestWrapper(unittest.TestCase):
 
     def is_alert_present(self):
         try: self.driver.switch_to_alert()
-        #try: self.webdriver.switch_to_alert()
         except NoAlertPresentException, e: return False
         return True
 
