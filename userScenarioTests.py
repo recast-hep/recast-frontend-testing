@@ -48,7 +48,7 @@ class userScenarioTests(unittest.TestCase):
         homepanel.analysesCatalog().click()
         anacatpanel = homepanel.getAnaCatalog().get('/')
         anacatpanel.get("/")
-        anacatpanel.
+        
 
     def viewMyAnalyses(self):
         '''Scenario: I want to be able to view all analyses I have submitted'''

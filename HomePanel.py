@@ -32,6 +32,7 @@ class HomePanel(PageObject):
     firstBtn = PageElement(partial_link_text=" first")
     lastBtn = PageElement(partial_link_text="last ")
     searchBox = PageElement(id_="edit-search-block-form--2")
+    catalogTab = PageElement(link_text="Analyses Catalog")
 
     def getTitle(self):
         return self.w.title
@@ -56,6 +57,9 @@ class HomePanel(PageObject):
             return False
         pe.click()
         return True #return PageElement(link_text="Add Request")
+    
+    def getAnaCatalog(self):
+        return CatalogPanel(self.w, '?q=analyses-catalog')
 
     def chkHeaderLinks(self):
         assert self.is_element_present(By.LINK_TEXT,"Feedback")
