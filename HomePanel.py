@@ -32,7 +32,13 @@ class HomePanel(PageObject):
     firstBtn = PageElement(partial_link_text=" first")
     lastBtn = PageElement(partial_link_text="last ")
     searchBox = PageElement(id_="edit-search-block-form--2")
-    catalogTab = PageElement(link_text="Analyses Catalog")
+    homeLink = PageElement(link_text='Home')
+    catalogLink = PageElement(link_text='Analyses Catalog')
+    requestsLink = PageElement(link_text='Requests')
+    aboutLink = PageElement(link_text='About')
+    devsLink =PageElement(link_text='Developers')
+    newsLink = PageElement(link_text='News')
+    helpLink = PageElement(link_text='Help')
 
     def getTitle(self):
         return self.w.title

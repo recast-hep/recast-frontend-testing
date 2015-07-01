@@ -44,8 +44,8 @@ class userScenarioTests(unittest.TestCase):
         loginpanel.username = self.testuser
         loginpanel.password = self.userpwd
         loginpanel.loginsubmit.click()
-        ana
-        homepanel.analysesCatalog().click()
+        homepanel = loginpanel.homeLink.click()
+        homepanel.catalogLink().click()
         anacatpanel = homepanel.getAnaCatalog().get('/')
         anacatpanel.get("/")
         
@@ -54,6 +54,10 @@ class userScenarioTests(unittest.TestCase):
         '''Scenario: I want to be able to view all analyses I have submitted'''
         homepanel = HomePanel(self.driver,self.pageURL)
         homepanel.get("/")
+        loginpanel = homepanel.getLoginPanel()
+        loginpanel.username = self.testuser
+        loginpanel.password = self.userpwd
+        loginpanel.loginsubmit.click()
         
     def viewAllAnalyses(self):
         '''Scenario: I want to be able to view all analyses submitted by others'''
